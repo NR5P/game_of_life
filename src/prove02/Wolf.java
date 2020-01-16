@@ -3,10 +3,11 @@ package prove02;
 import java.awt.*;
 import java.util.Random;
 
-public class Wolf extends Creature implements Movable, Aware, Aggressor {
+public class Wolf extends Creature implements Movable, Aware, Aggressor, Spawner {
     Random _rand;
     String[] directions = {"above", "right", "below", "left"};
-    int preferredDirection = 0;
+    private int preferredDirection = 0;
+    private boolean canSpawn = false;
 
     public Wolf() {
         _rand = new Random();
@@ -14,10 +15,15 @@ public class Wolf extends Creature implements Movable, Aware, Aggressor {
         System.out.println(preferredDirection);
     }
 
+    public Wolf(int locationX, int locationY) {
+        this.setLocation(new Point(--locationX, locationY));
+    }
+
     @Override
     public void attack(Creature target) {
         if (target instanceof Animal) {
             target.takeDamage(5);
+            canSpawn = !(target.isAlive());
         }
     }
 
@@ -93,5 +99,13 @@ public class Wolf extends Creature implements Movable, Aware, Aggressor {
             default:
                 break;
         }
+    }
+
+    @Override
+    public Creature spawnNewCreature() {
+        if (canSpawn) {
+            return new Wolf(this._location.x, this._location.y);
+        }
+        return null;
     }
 }
